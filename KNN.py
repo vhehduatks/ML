@@ -41,8 +41,8 @@ print(iris_dataset['target'])
 print(iris_dataset['data'][:5])
 
 #데이터셋 분할(훈련,테스트)
-x_train,x_test,y_train,y_test=train_test_split(iris_dataset.data,iris_dataset.target,random_state=0)
-x_train,x_test,y_train,y_test=train_test_split(iris_dataset.data,iris_dataset.target,random_state=0)
+# x_train,x_test,y_train,y_test=train_test_split(iris_dataset.data,iris_dataset.target,random_state=0)
+x_train,x_test,y_train,y_test=train_test_split(iris_dataset.data,iris_dataset.target,test_size=0.33,random_state=42)
 
 
 print('x_tarin의 크기',x_train.shape)
@@ -52,13 +52,13 @@ print('x_test의 크기',x_test.shape)
 print('y_test의 크기',y_test.shape)
 
 
-#넘파이로 데이터의 산전도행렬 표현
 
 #iris데이터프레임(x_train을 이용한) 만들기
-# iris_df=pd.DataFrame(x_train,columns=iris_dataset.feature_names)
+iris_df=pd.DataFrame(x_train,columns=iris_dataset.feature_names)
 
-# pd.plotting.scatter_matrix(iris_df,c=y_train,figsize=(15,15),marker='o',hist_kwds={'bins':20},s=60,alpha=0.8,cmap=mglearn.cm3)
-# plt.show()
+#넘파이로 데이터의 산전도행렬 표현
+pd.plotting.scatter_matrix(iris_df,c=y_train,figsize=(15,15),marker='o',hist_kwds={'bins':20},s=60,alpha=0.8,cmap=mglearn.cm3)
+plt.show()
 
 #가장 가까운 1개의 이웃의 영향을 받아 분류하도록 함
 knn=KNeighborsClassifier(n_neighbors=1)
@@ -89,5 +89,3 @@ plt.plot(k_range,accuracy)
 plt.xlabel('k')
 plt.ylabel('accuracy')
 plt.show()
-
-#1
