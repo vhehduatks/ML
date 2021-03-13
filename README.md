@@ -306,3 +306,4 @@ plt.show()
 ```
 ![KakaoTalk_20210313_212906363](https://user-images.githubusercontent.com/64114699/111029983-2c8c4e80-8443-11eb-9211-0f139db8fc11.png)
 <br><br/>
+2주차 총평: 내가 기계학습을 공부하는건지 pandas를 공부하는건지
