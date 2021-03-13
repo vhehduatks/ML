@@ -19,7 +19,6 @@ data_train,data_test,label_train,label_test=train_test_split(data,label,random_s
 
 #data모양을 확인
 print(data[:5])
-# print(label)
 data_frame=pd.DataFrame(data,label)
 print(type(data))
 print(data_frame.head())
