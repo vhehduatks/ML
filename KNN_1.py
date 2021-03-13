@@ -55,9 +55,10 @@ print('y_test의 크기',y_test.shape)
 
 #iris데이터프레임(x_train을 이용한) 만들기
 iris_df=pd.DataFrame(x_train,columns=iris_dataset.feature_names)
-
+print (iris_df.head())
 #넘파이로 데이터의 산전도행렬 표현
-pd.plotting.scatter_matrix(iris_df,c=y_train,figsize=(15,15),marker='o',hist_kwds={'bins':20},s=60,alpha=0.8,cmap=mglearn.cm3)
+# pd.plotting.scatter_matrix(iris_df,c=y_train,figsize=(15,15),marker='o',hist_kwds={'bins':20},s=60,alpha=0.8,cmap=mglearn.cm3)
+plt.plot('petal length (cm)','petal width (cm)',data=iris_df,linestyle='none',marker='o',alpha=0.5)
 plt.show()
 
 #가장 가까운 1개의 이웃의 영향을 받아 분류하도록 함
