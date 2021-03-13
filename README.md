@@ -1,6 +1,6 @@
 # Machine Learning readme
 - [Week_2.iris](#2주차iris-데이터셋-기계학습)
-- [Week 2.wisconsin](#2주차wisconsin-유방암-기계학습)
+- [Week 2.wisconsin](#2주차wisconsin-Breast-Cance-기계학습)
 ---
 ## (2주차)Iris 데이터셋 기계학습
 
@@ -169,7 +169,7 @@ after
 <br><br/>
 
 ---
-## (2주차)Wisconsin 유방암 기계학습
+## (2주차)Wisconsin Breast Cancer 기계학습
 
 순서
 1.  make_merge()를 사용한 데이터 생성 및 기계학습
