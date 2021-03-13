@@ -1,4 +1,6 @@
-# (2주차)Iris 품종분류 기계학습
+# Machine Learning readme
+- [Week_2](#2주차iris-품종분류-기계학습)
+## (2주차)Iris 품종분류 기계학습
 
 
 순서
