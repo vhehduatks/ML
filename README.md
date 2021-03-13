@@ -1,6 +1,6 @@
 # Machine Learning readme
 - [Week_2.iris](#2주차iris-데이터셋-기계학습)
-- [Week 2.wisconsin cancer](#(2주차)Wisconsin 유방암 기계학습)
+- [Week 2.wisconsin](#2주차wisconsin-유방암-기계학습)
 ---
 ## (2주차)Iris 데이터셋 기계학습
 
