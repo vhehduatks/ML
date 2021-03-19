@@ -307,3 +307,41 @@ plt.show()
 ![KakaoTalk_20210313_212906363](https://user-images.githubusercontent.com/64114699/111029983-2c8c4e80-8443-11eb-9211-0f139db8fc11.png)
 <br><br/>
 2주차 총평: 내가 기계학습을 공부하는건지 pandas를 공부하는건지
+
+---
+## (3주차)KNN회귀분석,선형회귀분석
+이전처럼 readme를 작성하는건 py파일을 올렸을경우에 어디서 어디까지 코드가 실행된건지 모르는 상황이 자주 발생하므로 유용했지만,
+ipynb파일을 git에 업로드 하면 해당 문제점이 해결되는 부분이므로 굳이 코드를 찍어 올리는 고생을 할 필요가 없어졌다.
+따라서 3주차부터는 코드를 작성하면서 막혔던 부분만 리뷰하는 형식으로 진행하려고 한다.
+
+```python
+#훈련용,테스트용 데이터셋으로 분류
+Input_train,Input_test,Output_train,Output_test=train_test_split(Input,Output,random_state=0)
+
+#K의 수를 3으로 하고 기계학습
+knn_R=KNeighborsRegressor(n_neighbors=3)
+knn_R.fit(Input_train,Output_train)
+
+#테스트셋 예측 및 도표화
+print('test_1 Output:',Output_test)
+Predict=knn_R.predict(Input_test)
+print('test_1 predict:',Predict)
+print('test_1 score:',knn_R.score(Input_test,Output_test))
+zero_y=[-3]*len(Input_test) #테스트셋의 인풋을 표현하기 위해 만든 y label
+data_p=plt.scatter(Input,Output,marker='o',alpha=0.5)
+predict_p=plt.scatter(Input_test,Predict,c='red',marker="*",alpha=0.5)
+input_p=plt.scatter(Input_test,zero_y,c='green',marker="*",alpha=0.5)
+plt.legend(handles=(data_p,predict_p,input_p),labels=('data','predict','test input'))
+plt.xlabel('Input')
+plt.ylabel('Output')
+plt.show()
+```
+zero_y라는 리스트는 np.linspace(시작,끝,갯수)를 사용하면 더 간편하게 구현이 가능
+plt.scatter함수에서 c='red'라고 할 필요없이 c='r'로 간편하게 구현이 가능
+plt.plot함수에는
+
+
+
+
+
+
