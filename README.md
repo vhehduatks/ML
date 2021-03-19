@@ -1,6 +1,7 @@
 # Machine Learning readme
 - [Week_2.iris](#2주차iris-데이터셋-기계학습)
 - [Week 2.wisconsin](#2주차wisconsin-breast-cancer-기계학습)
+- [Week 3.Regression](#3주차knn회귀분석선형회귀분석)
 ---
 ## (2주차)Iris 데이터셋 기계학습
 
