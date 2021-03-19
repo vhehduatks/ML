@@ -338,10 +338,145 @@ plt.show()
 ```
 zero_y라는 리스트는 np.linspace(시작,끝,갯수)를 사용하면 더 간편하게 구현이 가능
 plt.scatter함수에서 c='red'라고 할 필요없이 c='r'로 간편하게 구현이 가능
-plt.plot함수에는
+plt.plot함수에는 plot의 색,마커의 모양,선의 모양을 한번에 설정할 수 있는데 scatter에는 해당 기능이 없는것같다.
+<br><br/>
+
+```python
+def make_kn_p(K,N=40):
+    Dataset=mglearn.datasets.make_wave(n_samples=N)
+    Input,Output=Dataset
+    Input_train,Input_test,Output_train,Output_test=train_test_split(Input,Output,random_state=42)
+    knn_R=KNeighborsRegressor(n_neighbors=K)
+    knn_R.fit(Input_train,Output_train)
+    knn_test_score=knn_R.score(Input_test,Output_test)
+    knn_train_score=knn_R.score(Input_train,Output_train)
+    title='KNeighborsRegressor/'+'train score :'+'%.2f'%knn_train_score+', test score :'+'%.2f'%knn_test_score
+    plt.title(title)
+    #선으로 도표그리기
+    line=np.linspace(-3,3,1000).reshape(-1,1)
+    A=plt.scatter(Input_train,Output_train,c='b',marker='^',alpha=0.5)
+    B=plt.scatter(Input_test,Output_test,c='r',marker='v',alpha=0.5)
+    C,=plt.plot(line,knn_R.predict(line),c='g')
+    #plot은 ,을 붙어야 범례가 붙음.
+    plt.legend(handles=(A,B,C),labels=(['tarin','test','predict']))
+    plt.show()
+ ```
+plt.legend 함수는 항상 handles와 labels를 구별하여 붙일것, plot은 해당 plot 객체에','을 붙어야 범례가 붙음.
+<br><br/>
+
+```python
+#---------------------------------
+#선형회귀
+
+#데이터셋을 만듬
+Dataset=mglearn.datasets.make_wave(n_samples=60)
+Input,Output=Dataset
+
+#훈련용,테스트용으로 분류
+Input_train,Input_test,Output_train,Output_test=train_test_split(Input,Output,random_state=42)
+
+#선형회귀로 훈련
+lr=LinearRegression().fit(Input_train,Output_train)
+
+#score확인
+print('train score:',lr.score(Input_train,Output_train))
+print('test score:',lr.score(Input_test,Output_test))
+
+#선형회귀 일차방정식의 기울기와 절편
+print('lr.coef_:',lr.coef_)#기울기
+print('lr.intercept_:',lr.intercept_)#절편
+```
+선형회귀의 기울기 피라미터는 lr 객체의 coef_ 속성에 저장되어있다.+절편 피라미터는 intercept_속성에 저장되어있다.
+plt으로 도표를 만들때 scatter은 x값에 (N,)꼴이 들어가도 상관없지만 plot은 오류를 일으키므로 둘다 항상 (N,1)형태로 전환해주도록 하자
+(N,1)형태로 전환하는 방법은 numpy의 reshape 함수를 이용하면 간단하다. 
+ex.코드
+```python
+#보스턴 데이터에서 방의 개수로 산점도 그래프 작성
+dot1=plt.scatter(boston_df['RM'],Output,c='r',alpha=0.5)
 
 
+print(boston_df['RM'].shape)
+#pandas series 타입임
+print(type(boston_df['RM']))
 
+#RM 데이터가 1행에 다 들어있으므로 열로 바꿔줘야됨
+#reshape 함수를 사용하기 위해 넘파이 형식으로 바꿔줌
+new_x=np.reshape(boston_df['RM'].to_numpy(),(-1,1))
+print(new_x.shape)
+
+#훈련용, 테스트용 분류
+Input_train,Input_test,Output_train,Output_test=train_test_split(new_x,Output,random_state=0)
+```
+reshape 함수에서 (-1,1) -1은 본래 기준이 되었던 리스트의 길이에 따라 1개짜리 (N,1)리스트가 생성된다는 뜻
+<br><br/>
+데이터를 가공할때 우선 pd.DataFrame()형태로 가공하면 보기 편하다. 
++df는 'columns='를 사용해 열의 이름을 쉽게 바꿀수 있다.
+pd.DataFrame(data,label,colums='feature')형식으로 만들면 좋음
+이렇게 가공된 df는 라벨에 따라 분류하기도 편해짐 df=df.loc[0] 이란 소리는 해당 df에서 0인 라벨만 골라서 만들어진 df라는 뜻이다.
+이렇게 각각 뽑아버리면 나중에 도표로 만들때도 편해짐
+ex.
+```python
+#붙인라벨에 따라서 df 하나씩 생성
+temp_df_0=temp_df.loc[0]
+temp_df_1=temp_df.loc[1]
+```
++이렇게 만들어진 df는 원하는 column만 따로 뺄수도 있음 
+ex.
+```python
+iris_data_pl=iris_df['petal length (cm)']
+```
+<br><br/>
+로지스틱 회귀분석에서 OUTPUT을 0,1로 만들어야 할때 해당 리스트가 numpy array이면 OUTPUT=npArray==value 형식으로 표현하면 된다.
+ex.
+```python
+#---------------------------------
+#로지스틱 회귀분석(분류)
+iris=datasets.load_iris()
+
+print(iris.keys())
+print(iris.feature_names)
+print(iris.target_names)
+#1가지 특성만 가져옴 (petal length를 가져오기로 함)
+iris_df=pd.DataFrame(iris.data,columns=iris.feature_names)
+print(iris_df.head())
+iris_data_pl=iris_df['petal length (cm)']
+print(iris_data_pl.head())
+#로지스틱 회귀분석을 위해 1개의 output=virginica를 재외하고 0으로 만듬
+print(type(iris.target))
+OutPut=iris.target==2
+print(OutPut)
+```
+<br><br/>
+솔레노이드 곡선을 만들기 위해 로지스틱 회귀분류의 .predict_proba(x) 함수가 필요하다.
+이때 해당 함수로 만들어진 예측값은 (N,2)의 형태를 띄고 있는데
+col=0은 1-p값이고(예측이 틀릴 확률)
+col=1은 p값이다(예측이 맞을 확률)
+ex.
+```python
+#꽃잎의 넓이에 대해 로지스틱 회귀모델을 이용해 추정
+
+log_reg=LogisticRegression().fit(iris_data_pl,OutPut)
+Input_pl=np.linspace(min(iris_data_pl),max(iris_data_pl),1000).reshape(-1,1)
+#각input에 대한 확률을 예측
+p=log_reg.predict_proba(Input_pl)
+print(p.shape)
+#0열은 False, 1열은 True 라고 생각
+print(pd.DataFrame(p).head())
+p=pd.DataFrame(p)
+#도표화
+
+plt.scatter(iris_data_pl,OutPut,c='g',alpha=0.5,label='Yes or No')
+plt.plot(Input_pl,p[0],label='Non virginica')
+plt.plot(Input_pl,p[1],label='virginica')
+plt.ylabel('probability')
+plt.xlabel('petal width')
+plt.legend()
+plt.show()
+```
+<br><br/>
+도표를 분리하기 위한 함수는 
+mglearn.plots.plot_2d_separator(사용한 모델,모델의 train data ,fill=True,alpha=0.2)#분류모델,train_input,채움,투명도 이다
+이다.
 
 
 
