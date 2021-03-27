@@ -2,6 +2,7 @@
 - [Week_2.iris](#2주차iris-데이터셋-기계학습)
 - [Week 2.wisconsin](#2주차wisconsin-breast-cancer-기계학습)
 - [Week 3.Regression](#3주차knn회귀분석선형회귀분석)
+- [Week 4.Multi_class](#3주차knn회귀분석선형회귀분석)
 ---
 ## (2주차)Iris 데이터셋 기계학습
 
@@ -479,5 +480,138 @@ plt.show()
 mglearn.plots.plot_2d_separator(사용한 모델,모델의 train data ,fill=True,alpha=0.2)#분류모델,train_input,채움,투명도 이다
 이다.
 
+---
+## (4주차)Multi_class,나이브베이즈,결정트리,렌덤포레스트,부스팅
+많은 구현
+넘파이에선 해당 리스트에서 바로 []을 통해 원하는 부분 리스트를 만들어 낼수 있다.
+판다스에선 .loc[] 함수를 사용하여 동일한 기능을 사용할 수 있다.
+[행범위,열범위] 이고 범위는 :을 사용하여 표현한다.
+예시)
+```python
+#각각의 클래스가 군집화된 데이터를 만들어낼수 있는 make_blobs
+Data,label=make_blobs(random_state=42)
+#Data의 형태가 100x2 이고 label은 0,1,2 이다.
+#따라서 Data의 0열이 x, 1열이 y축인 3라벨 데이터이다.
+print(Data.shape)
+print(Data[:5])
+print(type(label))
+#넘파이 부분 집합 narray[행,열] 로 구분할수 있음. 범위는 ':'으로 구분함 
+#ex. 2차원 행렬의 1열만 부분행렬로 가져오고 싶으면 narray[:,1] 이다. :에 아무것도 없을경우 전체가 범위가 됨
+print(Data[:5,1].shape)
+#`elif` in list comprehension conditionals
+c_map=['r' if l==0 else 'g' if l==1 else 'b' for l in label]
+plt.scatter(Data[:,0],Data[:,1],c=c_map,alpha=0.5)
+plt.legend(['class 0','class 1','class 2'])
+plt.show()
+```
+Data[:,0] 은 모든 행범위에서 0열만 가져온다는 것이다.
+<br><br/>
+로지스틱 회귀에서 다수의 클래스(N개)가 존재할 경우 coef_에 N개의 행만큼 법선백터가 저장된다. 
+예시)
+![캡처](https://user-images.githubusercontent.com/64114699/112708511-b503f800-8ef5-11eb-8ca3-6e71c18489db.JPG)
+```python
+#계수의 형태가 (3,2)인 이유는 클래스가 3개이고 각 클래스의 법선백터(x,y)이기 때문이다.
+print('계수(기울기) 배열의 크기 :',logr.coef_.shape)
+print(logr.coef_)
+print('절편 배열의 크기 :',logr.intercept_.shape)
+x=np.linspace(min(Data[:,0]),max(Data[:,0]))
+for coef,intercept,color in zip(logr.coef_,logr.intercept_,['r','g','b']):
+    x_n_vec=coef[0]
+    y_n_vec=coef[1]
+    plt.plot(x,-(x*x_n_vec+intercept)/y_n_vec,c=color)
+plt.show()
+```
+<br><br/>
+데이터의 변화량이 급격할 경우 로그스케일로 데이터를 변환시키면 변화량이 잘 표현된다.
+semilogy 함수를 사용하면 데이터 자체를 로그화 시키지 않아도 로그화된 데이터를 표현해준다.
+하지만 해당 함수의 변수가 로그화된 것이므로 표에 새로운 그래프를 그릴경우 해당 데이터와의 격차를 생각해봐야 함.
+예시)
+```python
+#렘 가격 동향
+import os
+
+ram_prices = pd.read_csv(os.path.join(mglearn.datasets.DATA_PATH, "ram_price.csv"))
+#로그스케일로 램가격 동향 도표화
+plt.semilogy(ram_prices['date'],ram_prices['price'])
+
+#을 선형회귀와 결정트리회귀로 비교
+#훈련 셋은 2000년 이전,테스트 셋은 2000년 이후로 결정
+data_train=ram_prices[ram_prices['date']<2000]
+data_test=ram_prices[ram_prices['date']>=2000]
+
+#모양을 (N,1)꼴로 하였음 fit에서 2차원 배열을 요구함
+Input_train=data_train['date'].to_numpy().reshape(-1,1)
+#원래 데이터는 급격하게 줄어드는데 이걸 보기 편하게 하기 위해 로그스케일로 바꿈
+Output_train=np.log(data_train['price'].to_numpy().reshape(-1,1))
+print(Input_train[:5])
+print(Output_train[:5])
+#선형
+lr=LinearRegression().fit(Input_train,Output_train)
+
+#트리
+tree=DecisionTreeRegressor().fit(Input_train,Output_train)
+
+#예측
+pred_tree=tree.predict(ram_prices['date'].to_numpy().reshape(-1,1))
+pred_lr=lr.predict(ram_prices['date'].to_numpy().reshape(-1,1))
+
+#바꾼 로그스케일을 되돌림
+pred_tree=np.exp(pred_tree)
+pred_lr=np.exp(pred_lr)
+```
+<br><br/>
+교차검증은 cross_val_score(모델,데이터,라벨,레이어) 함수를 사용하여 쉽게 적용시킬 수 있다.
+예시)
+```python
+#렌덤포레스트를 이용한 moons 데이터셋 분류
+Data,label=datasets.make_moons(n_samples=100,noise=0.25,random_state=3)
+
+#훈련,테스트용으로 나눔
+Input_train,Input_test,Output_train,Output_test=train_test_split(Data,label,random_state=42)
+
+#포레스트 모델로 훈련 (n_estimators : 생성할 tree의 개수,max_features : 최대 선택할 특성의 수)
+forest=RandomForestClassifier(n_estimators=5,random_state=2).fit(Input_train,Output_train)
+
+#테스트 스코어
+print('test score:',round(forest.score(Input_test,Output_test),3))
+
+#교차검증
+cvscore=cross_val_score(forest,Data,label,cv=5)#교차검증 cv=5이므로 5겹 분할 교차검증,리턴값은 리스트
+print('(cv 5):',cvscore)
+print('test score(cv 5):',round(cvscore.mean(),3))
+
+cvscore=cross_val_score(forest,Data,label,cv=10)
+print('(cv 10):',cvscore)
+print('test score(cv 10):',round(cvscore.mean(),3))
+```
+
+<br><br/>
+subplots() 과  subplot() 의 차이
+subplot()은 하나의 ax만 만들수 있다. ax = plt.subplot(행,열,번호) 즉 N행M열의 서브플롯이 만들어지고 그중에 I번의 서브플롯이 ax라는 뜻
+
+subplots()은 fig, ax = plt.subplots() 형식으로사용하고 fig=서브플롯 전체 크기를 나타내고 figsize=(x,y) 변수로 비율을 설정할수 있음
+ax는 각각의 서브플롯을 의미한다.
+subplots() 예시)
+![캡처](https://user-images.githubusercontent.com/64114699/112708894-4d9b7780-8ef8-11eb-9335-7470f385ce6a.JPG)
+```python
+# 데이터 로드
+X, y = datasets.make_moons(n_samples=100, noise=0.25, random_state=3)
+X_train, X_test, y_train, y_test = train_test_split(X,y,stratify=y,random_state=42)
+
+# 모델 학습
+model = RandomForestClassifier(n_estimators=5, random_state=0)#트리 5개만 만듬
+model.fit(X_train, y_train)
+
+fig, axes = plt.subplots(2, 3, figsize=(20,10))#axes는 각각의 서브플롯 번호
+print(fig)
+for i,(ax,tree) in enumerate( zip( axes.ravel(), model.estimators_ )):#랜덤포레스트 내부 트리는 estimator_ 속성에 저장
+    ax.set_title("tree"+str(i))
+    mglearn.plots.plot_tree_partition(X, y, tree,ax=ax)
+    
+# 랜덤포레스트로 만들어진 결정경계
+axes[-1, -1].set_title("Random forest")
+mglearn.plots.plot_2d_separator(model, X, fill=True, alpha=0.5, ax=axes[-1,-1] )
+mglearn.discrete_scatter(X[:,0], X[:,1], y)
+```
 
 
