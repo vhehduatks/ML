@@ -3,6 +3,7 @@
 - [Week 2.wisconsin](#2주차wisconsin-breast-cancer-기계학습)
 - [Week 3.Regression](#3주차knn회귀분석선형회귀분석)
 - [Week 4.A lot of things](#4주차multi_class나이브베이즈결정트리렌덤포레스트부스팅)
+- [Week 5.Ensemble,SVM,](#4주차multi_class나이브베이즈결정트리렌덤포레스트부스팅)
 ---
 ## (2주차)Iris 데이터셋 기계학습
 
@@ -614,4 +615,105 @@ mglearn.plots.plot_2d_separator(model, X, fill=True, alpha=0.5, ax=axes[-1,-1] )
 mglearn.discrete_scatter(X[:,0], X[:,1], y)
 ```
 
+---
+## (5주차)부스팅,앙상블,SVM,신경망
+3차원 그래픽을 표현할 경우 대략적인 과정
+1.fig=plt.figure(figsize=(인치,인치))
+2.fig.add_suplot()의 피라미터로 projection='3d' 입력
+예시)
+```python
+#3차원 그래픽
+fig=plt.figure(figsize=(8,8))
 
+#111은 1x1 그리드의 1번째 플롯이라는 뜻
+#234는 2x3 그리드의 4번째 플롯이라는 뜻
+#3차원:projection='3d'
+ax=fig.add_subplot(111,projection='3d')
+
+#데이터 가공
+blob_df_3d=pd.DataFrame(new_data,label)
+
+class0=blob_df_3d.loc[0]
+class1=blob_df_3d.loc[1]
+
+#도표화
+cs0=ax.scatter(class0.loc[:,0],class0.loc[:,1],class0.loc[:,2],c='b',s=50)
+cs1=ax.scatter(class1.loc[:,0],class1.loc[:,1],class1.loc[:,2],c='r',marker='^',s=50)
+
+#Invert Axes 는 set_?lim()함수를 사용하면 된다. set_zlim(140,0)= z축을 140부터 시작하여 0까지 가도록 함
+ax.set_zlim(140,0)
+
+plt.show()
+```
+<br><br/>
+3차원 시각화의 경우 시점을 조절해야 할 필요가 생기는데 이때 azim과 elev를 사용한다
+plt.azim=value는 3차원 공간을 z축을 기준으로 좌우로 돌린다.
+plt.elev=value는 3차원 공간을 상하로 돌린다.
+예시)
+```python
+#3차원 그래픽
+fig=plt.figure(figsize=(8,8))
+ax=fig.add_subplot(111,projection='3d')
+
+#데이터 가공
+blob_df_3d=pd.DataFrame(new_data,label)
+
+class0=blob_df_3d.loc[0]
+class1=blob_df_3d.loc[1]
+
+#도표화
+cs0=ax.scatter(class0.loc[:,0],class0.loc[:,1],class0.loc[:,2],c='b',s=50)
+cs1=ax.scatter(class1.loc[:,0],class1.loc[:,1],class1.loc[:,2],c='r',marker='^',s=50)
+ax.set_xlabel('x')
+ax.set_ylabel('y')
+ax.set_zlabel('z=y^2')
+#Invert Axes 는 set_?lim()함수를 사용하면 된다. set_zlim(140,0)= z축을 140부터 시작하여 0까지 가도록 함
+ax.set_zlim(140,0)
+
+#3차원 투영된 도표를 분류
+
+lin_svm_3d = LinearSVC().fit(blob_df_3d, label)
+coef, intercept = lin_svm_3d.coef_.ravel(),lin_svm_3d.intercept_
+#법선벡터가 하나 들어있음 (x,y,z)
+print(coef)
+print(intercept)
+
+#x좌표와 y좌표를 만듬
+x = np.linspace(blob_df_3d.loc[:, 0].min() - 2, blob_df_3d.loc[:, 0].max() + 2, 50)
+y = np.linspace(blob_df_3d.loc[:, 1].min() - 2, blob_df_3d.loc[:, 1].max() + 2, 50)
+#격자점을 만들어주는 함수 .meshgrid
+X, Y = np.meshgrid(x,y)
+print(X.shape)
+
+#격자점에 따라서 Z좌표를 만듬 (법선벡터가 존재하므로 평방에 대입시켜서 만들수 있음)
+Z=(coef[0]*X+coef[1]*Y+intercept)/(-coef[2])
+
+#X,Y,Z 좌표가 만들어졌으므로 평면을 그릴수 있음
+surf=ax.plot_surface(X,Y,Z ,alpha=0.5)
+
+#azim 3차원 공간을 좌우로 돌림, elev 위아래로 돌림
+ax.azim = 35
+ax.elev = 10
+
+#나누어진것을 확인할 수 있다.
+plt.show()
+```
+plt로 subplots 할 경우 ax에다가 직접 입력
+mglearn은 ax피라미터 이용
+예시)
+```python
+#은닉 유닛과 alpha 매개변수의 변화에 따른 결정경계
+Input_train,Input_test,Output_train,Output_test=train_test_split(data,label,random_state=42)
+fig, axes = plt.subplots(2, 4, figsize=(20, 8))
+for axx, n_hidden_nodes in zip(axes, [10, 100]):
+    for ax, alpha in zip(axx, [0.0001, 0.01, 0.1, 1]):
+        #ax는 plt이다.
+        cs0=ax.scatter(class0.loc[:,0], class0.loc[:, 1],c='b',label='class0',alpha=0.5)
+        cs1=ax.scatter(class1.loc[:,0], class1.loc[:, 1],c='r',label='class1',alpha=0.5)
+        #다중퍼셉트론의 구현
+        mlp = MLPClassifier(solver='lbfgs',hidden_layer_sizes=[n_hidden_nodes,n_hidden_nodes], random_state=0,alpha=alpha).fit(Input_train,Output_train)
+        mglearn.plots.plot_2d_separator(mlp, Input_train, fill=True, alpha=.3,ax=ax)
+
+        ax.legend()
+        ax.set_title("n_hidden=[{}, {}]\nalpha={:.4f}".format(n_hidden_nodes, n_hidden_nodes, alpha))
+```
