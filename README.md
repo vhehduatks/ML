@@ -3,7 +3,7 @@
 - [Week 2.wisconsin](#2주차wisconsin-breast-cancer-기계학습)
 - [Week 3.Regression](#3주차knn회귀분석선형회귀분석)
 - [Week 4.A lot of things](#4주차multi_class나이브베이즈결정트리렌덤포레스트부스팅)
-- [Week 5.Ensemble,SVM,](#4주차multi_class나이브베이즈결정트리렌덤포레스트부스팅)
+- [Week 5.Ensemble,SVM,신경망](#5주차부스팅앙상블svm신경망)
 ---
 ## (2주차)Iris 데이터셋 기계학습
 
